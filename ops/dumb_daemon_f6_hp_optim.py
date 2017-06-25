@@ -1,8 +1,7 @@
-import sys, os
+import os
 import numpy as np
 import scipy as sp
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
-sys.path.append('/home/drew/Documents/')
 import tensorflow as tf
 import model_utils
 from copy import deepcopy
@@ -11,6 +10,7 @@ from model_defs.model_cpu_port_scan_optim import ContextualCircuit
 from ops.db_utils import update_data, get_lesion_rows_from_db, count_sets
 from fig_6_utils import get_rdots
 from scipy.optimize import curve_fit
+
 
 def adjust_parameters(defaults,hps):
     hps_keys = hps.keys()

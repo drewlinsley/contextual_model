@@ -142,6 +142,9 @@ class ContextualCircuit(object):
             dtype=self.floatXtf,
             initializer=u_init.astype(self.floatXnp))
 
+        ###### Reviews Analysis 1: Try changing the eCRF tuning properties... 
+        # Set these to gaussians instead of uniform and try a few different sigmas.
+
         # tuned summation: pooling in h, w dimensions
         #############################################
         SSN_ = 2 * ifloor(SSN/2.0) + 1
@@ -183,7 +186,7 @@ class ContextualCircuit(object):
                 self.floatXnp))
 
     def body(
-            self, i0, O, I, alpha, beta, mu, nu, gamma, delta, I_diff, O_diff):
+            self, i0, O, I, alpha, beta, mu, nu, gamma, delta):  # , I_diff, O_diff):
 
         # Track initial I, O
         prev_I = tf.identity(I)
@@ -227,18 +230,79 @@ class ContextualCircuit(object):
         O = self.tf_sig_tau * O + self.tf_tau * O_summand
 
         # Store deviation of I and O from previous timestep
-        I_diff = tf.concat(
-            axis=0, values=[I_diff, tf.reshape(tf.reduce_mean(I - prev_I), [1, ])])
-        O_diff = tf.concat(
-            axis=0, values=[O_diff, tf.reshape(tf.reduce_mean(O - prev_O), [1, ])])
+        # I_diff = tf.concat(
+        #     axis=0,
+        #     values=[I_diff, tf.reshape(tf.reduce_mean(I - prev_I), [1, ])])
+        # O_diff = tf.concat(
+        #     axis=0,
+        #     values=[O_diff, tf.reshape(tf.reduce_mean(O - prev_O), [1, ])])
 
         # Iterate counter
         i0 += 1
-        return i0, O, I, alpha, beta, mu, nu, gamma, delta, I_diff, O_diff
+        return i0, O, I, alpha, beta, mu, nu, gamma, delta  # , I_diff, O_diff
+
+    def body_overlap_CRF_eCRF(
+            self, i0, O, I, alpha, beta, mu, nu, gamma, delta):  # , I_diff, O_diff):
+
+        '''
+        ###### Reviews Analysis 2: Lesion one of these
+        Combine the CRF activities with the near eCRFs
+        Q *= P
+        U *= P
+        excise P
+        '''
+
+        if 'U' in self.lesions:
+            U = tf.constant(0.)
+        else:
+            U = tf.nn.conv2d(
+                O, self._gpu_u, self.parameters.strides, padding='SAME')
+
+        if 'T' in self.lesions:
+            T = tf.constant(0.)
+        else:
+            T = tf.nn.conv2d(
+                O, self._gpu_t, self.parameters.strides, padding='SAME')
+
+        if 'P' in self.lesions:
+            P = tf.constant(0.)
+        else:
+            P = tf.nn.conv2d(
+                I, self._gpu_p, self.parameters.strides, padding='SAME')
+
+        if 'Q' in self.lesions:
+            Q = tf.constant(0.)
+        else:
+            Q = tf.nn.conv2d(
+                I, self._gpu_q, self.parameters.strides, padding='SAME')
+
+        I_summand = tf.nn.relu(
+            (self.xi * self.X)
+            - ((alpha * I + mu) * (U * P))
+            - ((beta * I + nu) * T))
+
+        I = self.tf_eps_eta * I + self.tf_eta * I_summand
+
+        O_summand = tf.nn.relu(
+            self.parameters.zeta * I
+            + delta * (Q * P))
+        O = self.tf_sig_tau * O + self.tf_tau * O_summand
+
+        # Store deviation of I and O from previous timestep
+        # I_diff = tf.concat(
+        #     axis=0,
+        #     values=[I_diff, tf.reshape(tf.reduce_mean(I - prev_I), [1, ])])
+        # O_diff = tf.concat(
+        #     axis=0,
+        #     values=[O_diff, tf.reshape(tf.reduce_mean(O - prev_O), [1, ])])
+
+        # Iterate counter
+        i0 += 1
+        return i0, O, I, alpha, beta, mu, nu, gamma, delta  # , I_diff, O_diff
 
     # def condition(self,i0,O,I,xi,alpha,beta,mu,nu,gamma,delta):
     def condition(
-            self, i0, O, I, alpha, beta, mu, nu, gamma, delta, I_diff, O_diff):
+            self, i0, O, I, alpha, beta, mu, nu, gamma, delta):  # , I_diff, O_diff):
         return i0 < self.maxiter
 
     def run(self, in_array):
@@ -264,6 +328,8 @@ class ContextualCircuit(object):
             initializer=np.array(
                 1.0 - EPSILON**2 * self.stepsize * 1.0/ETA).astype(
                 self.floatXnp))
+
+
         self.tf_tau = tf.get_variable(
             name='h/tau', dtype=self.floatXtf,
             initializer=np.array(
@@ -295,21 +361,49 @@ class ContextualCircuit(object):
         i0 = tf.constant(0)
         O = tf.identity(self.X)
         I = tf.identity(self.X)
-        I_diff = tf.constant([0.], dtype=tf.float32)
-        O_diff = tf.constant([0.], dtype=tf.float32)
+        # I_diff = tf.zeros_like(
+        #     tf.placeholder(tf.float32, shape=[1, None]),
+        #     dtype=tf.float32)
+        # O_diff = tf.zeros_like(
+        #     tf.placeholder(tf.float32, shape=[1, None]),
+        #     dtype=tf.float32)
+
+        nl_lesions = 'ignore'  # doing this from the parameters instead
+        if nl_lesions is 'l':
+            print 'Ablating mu'
+            self.mu = self.mu * 0
+            print 'Ablating nu'
+            self.nu = self.nu * 0
+        elif nl_lesions is 'nl':
+            print 'Ablating alpha'
+            self.alpha = self.alpha * 0
+            print 'Ablating beta'
+            self.beta = self.beta * 0
 
         # While loop
         elems = [
-            i0, O, I,  # self.xi,
-            self.alpha, self.beta,
-            self.mu, self.nu, self.gamma, self.delta,
-            I_diff, O_diff]
+            i0,
+            O,
+            I,
+            self.alpha,
+            self.beta,
+            self.mu,
+            self.nu,
+            self.gamma,
+            self.delta,
+            # I_diff,
+            # O_diff
+        ]
+
         returned = tf.while_loop(
-            self.condition, self.body, loop_vars=elems,
-            back_prop=False, swap_memory=False)
+            self.condition,
+            self.body_overlap_CRF_eCRF,  # self.body,
+            loop_vars=elems,
+            back_prop=False,
+            swap_memory=False)
 
         # Prepare output
         self.out_O = returned[1]
         self.out_I = returned[2]
-        self.I_diff = returned[-2]
-        self.O_diff = returned[-1]
+        # self.I_diff = returned[-2]
+        # self.O_diff = returned[-1]

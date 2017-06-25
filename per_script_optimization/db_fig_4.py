@@ -1,7 +1,5 @@
 from __future__ import absolute_import
-import sys,os
-sys.path.append('/home/drew/Documents/')
-sys.path.append('/home/drew/Documents/tf_experiments/experiments/contextual_circuit/')
+import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 import numpy as np
 import scipy as sp
@@ -9,6 +7,7 @@ from ops.parameter_defaults import PaperDefaults
 from ops.dumb_daemon_db_hp_optim import optimize_model
 from ops.fig_4_utils import *
 from ops.model_utils import sfit
+
 
 def run(initialize_model=False):
     defaults = PaperDefaults()

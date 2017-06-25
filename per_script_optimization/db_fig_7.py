@@ -1,14 +1,13 @@
 from __future__ import absolute_import
-import sys,os,joblib
-sys.path.append('/home/drew/Documents/')
-sys.path.append('/home/drew/Documents/tf_experiments/experiments/contextual_circuit/')
+import os,joblib
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 import numpy as np
 import scipy as sp
-from hmax.tools.utils import iround
+from ops.model_utils import iround
 from ops.parameter_defaults import PaperDefaults
 from ops.dumb_daemon_f7_hp_optim import optimize_model, create_stimuli
 import ops.model_cutils as cutils
+
 
 def run(make_stims=False):
     defaults = PaperDefaults()

@@ -6,9 +6,9 @@
 import numpy as np
 #from numpy import r_, s_
 import scipy as sp
-from scipy import stats
+from scipy import stats, special, array, dot, floor, ceil, around, absolute
+
 #from scipy import ndimage
-from scipy import special
 #from scipy.ndimage.filters import uniform_filter1d as u1d
 #from scipy.ndimage.filters import maximum_filter1d as m1d
 #from scipy.ndimage.filters import gaussian_filter1d as g1d
@@ -16,7 +16,6 @@ from scipy.interpolate import UnivariateSpline, LSQUnivariateSpline
 #from hmax.models.hnorm.computation import pool, hwrectify
 #from hmax.models.ucircuits.contextual import stimuli as stim
 # from hmax.models.ucircuits.contextual import contextual as cx
-from hmax.models.ucircuits.contextual.contextual_CUDA import _DEFAULT_PARAMETERS
 from sklearn import preprocessing
 from matplotlib import pyplot as plt
 from matplotlib import patches
@@ -28,6 +27,14 @@ from fig_4_utils import lms2dklC, _regression_DKL
 import model_cutils
 # import colormaps as custom_colormaps
 # cm.register_cmap(name='viridis', cmap=custom_colormaps.viridis)
+
+from parameter_defaults import PaperDefaults
+defaults = PaperDefaults()
+_DEFAULT_PARAMETERS = defaults._DEFAULT_PARAMETERS
+
+
+
+
 plt.rcParams['image.cmap'] = 'viridis'
 plt.rcParams['axes.grid'] = False
 default_cmap = 'viridis'

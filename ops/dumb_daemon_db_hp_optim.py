@@ -1,14 +1,12 @@
-import sys, os
+import sys
 import numpy as np
-os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
-sys.path.append('/home/drew/Documents/')
 import tensorflow as tf
 import model_utils
 from copy import deepcopy
 from timeit import default_timer as timer
 from model_defs.model_cpu_port_scan_optim import ContextualCircuit
 from ops.db_utils import update_data, get_lesion_rows_from_db, count_sets
-from hmax.tools.utils import iceil
+from model_utils import iceil
 
 def adjust_parameters(defaults,hps):
     hps_keys = hps.keys()

@@ -1,16 +1,13 @@
 from __future__ import absolute_import
-import sys,os
-sys.path.append('/home/drew/Documents/')
-sys.path.append('../')
+import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 import numpy as np
 import scipy as sp
-from hmax.models.ucircuits.contextual import stimuli as stim
-from hmax.tools.utils import iround
 from ops.parameter_defaults import PaperDefaults
 from ops.single_hp_optim import optimize_model
 from ops import model_utils as utils
 import seaborn as sns 
+
 
 def run():
     defaults = PaperDefaults()
@@ -36,7 +33,7 @@ def run():
     contrasts = sp.linspace(1., 0., ncontrasts, endpoint=False)[::-1]
     # contrasts = sp.logspace(-2, 0., ncontrasts)
     x = sp.array([utils.get_population(
-        im_, 'gaussian', npoints=npoints) for im_ in im])
+        _im, 'gaussian', npoints=npoints) for _im in im])
     ax = [c*x for c in contrasts]
     cx = np.concatenate(ax[:],axis=0)
     

@@ -184,7 +184,6 @@ def plot_distributions(lesions, defaults):
     for idx, lab in enumerate(unique_labels):
         it_data = df[df['Figure name'] == lab]
         # execute_histogram_plot(it_data, idx, defaults)
-        import ipdb;ipdb.set_trace()
         execute_density_plot(it_data, idx, defaults)
 
 

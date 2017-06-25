@@ -1,7 +1,7 @@
-import sys, os
+import os
 import numpy as np
 import scipy as sp
-sys.path.append('/home/drew/Documents/')
+import sys
 os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 import tensorflow as tf
 import model_utils

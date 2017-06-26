@@ -32,7 +32,7 @@ class PaperDefaults(object):
             raise ValueError('Invalid value for _PARAMETER_SET_VERSION')
 
 
-        self.table_name = 'alpha_beta_2'  # mu_nu'  # 'sig_tau' hpcombos'  # 'xi_lesion'  # 'hpcombos'
+        self.table_name = 'full_table'  # 'mu_nu_2'  # alpha_beta_2 mu_nu'  # 'sig_tau' hpcombos'  # 'xi_lesion'  # 'hpcombos'
         #Figure specific items
         self.f4_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f4.npz' 
         self.f7_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f7.npy'
@@ -60,7 +60,8 @@ class PaperDefaults(object):
         }
 
         self.hp_optim_type = 'random_exp'  #'none' 'uniform' 'random' random_exp and 'random_linear'
-        self.lesions = ['None']  # ,'Q','U','P','T']  #['mely']
+        # self.lesions = ['None']  # ,'Q','U','P','T']  #['mely']
+        self.lesions = ['None', 'Q', 'U', 'P', 'T', 'mu_nu_insert', 'alpha_beta_insert', 'combined_crf_ercf_insert', 'overlapping_ecrf_insert']
         self.tunable_params = ['alpha','beta','mu','nu','gamma','delta']
         self.tune_max_scale = np.repeat(100,len(self.tunable_params)) #not used with random_log
         self.tune_step = np.repeat(0.01,len(self.tunable_params)) #not used with random_log

@@ -3,6 +3,7 @@ import numpy as np
 from ops.db_utils import get_all_lesion_data
 from ops.parameter_defaults import PaperDefaults
 from ops.plot_hp_optims import plot_chart, plot_distributions
+from scipy import stats
 """
 1. x Extract all data from the database
 2. x Find the hyperparameters for each lesion with max fit t-scored across
@@ -40,14 +41,34 @@ for lesion in defaults.lesions:
     max_row[lesion] = it_max
     # bootstrap here
 
+# Run stats -- None versus the rest
+target_key = 'None'
+Tvs = max_row[target_key]
+T = [np.arctanh(Tvs[col]) for col in defaults.db_problem_columns]
+t_keys = [k for k in defaults.lesions if k is not target_key]
+t_stats = {}
+p_values = {}
+for k in t_keys:
+    t = [np.arctanh(max_row[k][col]) for col in defaults.db_problem_columns]
+    tv, pv = stats.ttest_rel(T, t)
+    t_stats[k] = tv
+    p_values[k] = pv
+
+
 np.savez(
     os.path.join(
-        defaults._FIGURES, 'best_hps'), lesions=defaults.lesions,
-    max_row=max_row)
+        defaults._FIGURES, 'best_hps'),
+    lesions=defaults.lesions,
+    max_row=max_row,
+    p_values=p_values,
+    t_stats=t_stats)
 
 # Remove Empty "lesions"
-max_row = {k: v for k, v in max_row.iteritems() if v is not None}
-defaults.lesions = max_row.keys()
+for v in max_row.values():
+    if v is None:
+        raise RuntimeError('Found empty row in your lesion matrix.')
+# max_row = {k: v for k, v in max_row.iteritems() if v is not None}
+# defaults.lesions = max_row.keys()
 
 # If desired purge specific figures
 if defaults.remove_figures is not None:

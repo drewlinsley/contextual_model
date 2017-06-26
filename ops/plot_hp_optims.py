@@ -156,17 +156,27 @@ def execute_density_plot(it_data, name, defaults, col_wrap=None):
     plt.close('all')
 
 
-def execute_histogram_plot(it_data, name, defaults):
+def execute_histogram_plot(it_data, name, defaults, ax=None):
     # Plot with seaborn
     sns.set(style="ticks")
     X = it_data['Model fit'].as_matrix().reshape(-1, 1)
-    plt.hist(X, bins=np.linspace(-1, 1, 1e3), normed=True)
+    if ax is not None:
+        ax.hist(X, bins=np.linspace(-1, 1, 1e3), normed=True)
+    else:
+        plt.hist(X, bins=np.linspace(-1, 1, 1e3), normed=True)
     plt.xlim([-1, 1])
     plt.ylim([0, 1])
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    ax.set_xticks([])
+    ax.set_yticks([])
     plt.savefig(
         os.path.join(
             defaults._FIGURES, 'coefficient_distribution_%s.pdf' % name))
-    plt.close('all')
+    if ax is not None:
+        return ax
+    else:
+        plt.close('all')
 
 
 def plot_distributions(lesions, defaults):
@@ -181,10 +191,12 @@ def plot_distributions(lesions, defaults):
         columns=['Model fit', 'Figure name'])
     execute_density_plot(df, 'all', defaults, col_wrap=4)
     unique_labels = np.unique(df['Figure name'])
-    for idx, lab in enumerate(unique_labels):
+    f, axs = plt.subplots(2, 4)
+    axs = axs.reshape(-1)
+    for idx, (lab, ax) in enumerate(zip(unique_labels, axs)):
         it_data = df[df['Figure name'] == lab]
-        # execute_histogram_plot(it_data, idx, defaults)
-        execute_density_plot(it_data, idx, defaults)
+        execute_histogram_plot(it_data, idx, defaults, ax=ax)
+        # execute_density_plot(it_data, idx, defaults)
 
 
 if __name__ == '__main__':

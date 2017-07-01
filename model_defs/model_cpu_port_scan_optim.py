@@ -129,10 +129,16 @@ class ContextualCircuit(object):
                 [
                     sp.roll(weights, shift=shift) for shift in range(k)])
             q_array.shape = (1, 1, k, k)
-            self._gpu_q = tf.get_variable(
-                name='gpu_q',
-                dtype=self.floatXtf,
-                initializer=q_array.astype(self.floatXnp))
+            if defaults['optimize_omega']:
+                self._gpu_q = tf.placeholder(
+                    name='gpu_q',
+                    dtype=self.floatXtf,
+                    shape=q_array.shape)
+            else:
+                self._gpu_q = tf.get_variable(
+                    name='gpu_q',
+                    dtype=self.floatXtf,
+                    initializer=q_array.astype(self.floatXnp))
 
         # untuned suppression: reduction across feature axis
         ####################################################

@@ -154,7 +154,6 @@ class ContextualCircuit(object):
         t_array = t_array.transpose(2,3,0,1)
 
         # Tf dimension reordering
-        # Gaussian weights
         self._gpu_t = tf.get_variable(name='t_array',dtype=self.floatXtf,initializer=t_array.astype(self.floatXnp))
 
     #------------------------------------------------------------#

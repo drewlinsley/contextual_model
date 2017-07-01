@@ -30,6 +30,10 @@ def generate_combos():
     ofun = grab_sampler(defaults)
     add_to_database(defaults,ofun)
 
+def generate_omega_combos():
+    ofun = grab_sampler(defaults)
+    add_omegas_to_database(defaults,ofun)
+
 def prepare_settings(fig_names):
     #Connect to database
     conn,cur = open_db()
@@ -62,6 +66,24 @@ def add_to_database(parameters,ofun,table_name=defaults.table_name):
                 (table_name,l,random_parameters['alpha'],random_parameters['beta'],
                     random_parameters['mu'],random_parameters['nu'],
                     random_parameters['gamma'],random_parameters['delta']))
+
+    #Finalize and close connections
+    conn.commit()
+    close_db(cur,conn)
+
+def add_omegas_to_database(parameters,ofun,table_name=defaults.table_name):
+    best_fits = np.load(os.path.join(
+            defaults._FIGURES, 'best_hps.npz'))['max_row']
+    best_fits = best_fits.item()['None']
+    #Connect to database
+    conn,cur = open_db()
+    for l in parameters.lesions:
+        for idx in range(parameters.iterations):
+            random_parameters = ofun(parameters)._DEFAULT_PARAMETERS
+            cur.execute("INSERT INTO omega (_id,lesions,alpha,beta,mu,nu,gamma,delta,omega) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                (idx,l,best_fits['alpha'],best_fits['beta'],
+                    best_fits['mu'],best_fits['nu'],
+                    best_fits['gamma'],best_fits['delta'],random_parameters['omega']))
 
     #Finalize and close connections
     conn.commit()

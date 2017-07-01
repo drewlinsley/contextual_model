@@ -161,7 +161,7 @@ def execute_histogram_plot(it_data, name, defaults, ax=None):
     sns.set(style="ticks")
     X = it_data['Model fit'].as_matrix().reshape(-1, 1)
     if ax is not None:
-        ax.hist(X, bins=np.linspace(-1, 1, 1e3), normed=True)
+        ax.hist(X, bins=np.linspace(-1, 1, 10e3), normed=True)
     else:
         plt.hist(X, bins=np.linspace(-1, 1, 1e3), normed=True)
     plt.xlim([-1, 1])

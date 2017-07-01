@@ -8,10 +8,13 @@ import model_utils
 import model_cutils as cutils
 from copy import deepcopy
 from timeit import default_timer as timer
-from model_defs.model_cpu_port_scan_optim import ContextualCircuit
+from model_defs.model_cpu_port_scan_optim import ContextualCircuit, _sgw, _sdw
 from skimage.color import rgb2xyz
 from ops.db_utils import update_data, get_lesion_rows_from_db, count_sets
+from ops.parameter_defaults import PaperDefaults
 
+
+defaults = PaperDefaults().__dict__
 CIECAM02_CAT = sp.array([[ 0.7328,  0.4296, -0.1624],
                          [-0.7036,  1.6975,  0.0061],
                          [ 0.003 ,  0.0136,  0.9834]])
@@ -86,6 +89,15 @@ def compute_shifts(x, sess, ctx, extra_vars, default_parameters):
     ctx.nu:default_parameters._DEFAULT_PARAMETERS['nu'].reshape(-1,1),
     ctx.gamma:default_parameters._DEFAULT_PARAMETERS['gamma'].reshape(-1,1),
     ctx.delta:default_parameters._DEFAULT_PARAMETERS['delta'].reshape(-1,1)}
+    if default_parameters.optimize_omega:
+        _, _, _, k = x.shape
+        weights = _sgw(k=k, s=default_parameters._DEFAULT_PARAMETERS['omega']) \
+            if defaults['_DEFAULT_PARAMETERS']['continuous'] else _sdw(k=k, s=default_parameters._DEFAULT_PARAMETERS['omega'])
+        q_array = sp.array(
+            [
+                sp.roll(weights, shift=shift) for shift in range(k)])
+        q_array.shape = (1, 1, k, k)
+        feed_dict[ctx._gpu_q] = q_array
     if extra_vars['return_var'] == 'I':
         y = sess.run(ctx.out_I,feed_dict=feed_dict)
     elif extra_vars['return_var'] == 'O':

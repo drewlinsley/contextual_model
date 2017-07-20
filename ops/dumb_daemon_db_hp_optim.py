@@ -9,7 +9,7 @@ import scipy as sp
 from ops.db_utils import update_data, get_lesion_rows_from_db, count_sets
 from model_utils import iceil
 from ops.parameter_defaults import PaperDefaults
-
+import ops.fig_4_utils as f4
 
 defaults = PaperDefaults().__dict__
 
@@ -96,15 +96,25 @@ def get_fits(y,gt,extra_vars):
         it_score = np.corrcoef(y,gt)[0,1]# ** 2
     return it_score
 
-def optimize_model(im,gt,extra_vars,parameters):
 
+def sampler(x):
+        return abs(np.random.uniform(low=x - 1, high=x + 1) + x) ** np.random.uniform(low=-2.,high=2.)  # previously did [0, 2]
+
+
+def optimize_model(im,gt,extra_vars,parameters):
+ 
     #Do outer loop of lesions -- embed in variable scopes
     for lesion in parameters.lesions:
         outer_parameters = deepcopy(parameters)
         outer_parameters.lesions = lesion
-        print('Running optimizations on problem ' + extra_vars['figure_name'] + ' after lesioning: ' + ' '.join(outer_parameters.lesions))
         #Optional stuff and data prep
         if extra_vars['figure_name'] == 'f4': #precalculated
+            stim_files = f4.create_stims(extra_vars)
+            extra_vars['stims_all_lms'] = stim_files['stims_all_lms']
+            im = stim_files['so_ind'].reshape(
+                extra_vars['n_t_hues']*extra_vars['n_s_hues'],len(extra_vars['_DEFAULT_KW2015_SO_PARAMETERS']['norm_channels']),extra_vars['size'],extra_vars['size'])
+            extra_vars['aux_data'] = stim_files['so_all'].transpose(0,2,3,1)
+            extra_vars['cs_hue_diff'] = stim_files['cs_hue_diff']
             x = im.transpose(0,2,3,1) #need to copy or what?
             with tf.device('/gpu:0'):
                 with tf.variable_scope('aux_' + lesion):
@@ -113,6 +123,7 @@ def optimize_model(im,gt,extra_vars,parameters):
         elif extra_vars['figure_name'] == 'tbp' or extra_vars['figure_name'] == 'tbtcso' or extra_vars['figure_name'] == 'bw' or extra_vars['figure_name'] == 'cross_orientation_suppression':
             x = im.transpose(0,2,3,1)
         else:
+            extra_vars['scale'] = sampler(extra_vars['scale'])
             x = model_utils.get_population2(im,
                 npoints=extra_vars['npoints'], kind=extra_vars['kind'],
                  scale=extra_vars['scale']).astype(outer_parameters._DEFAULT_FLOATX_NP).transpose(0,2,3,1) #transpose to bhwc
@@ -164,12 +175,9 @@ def optimize_model(im,gt,extra_vars,parameters):
                         it_score = get_fits(y, gt, extra_vars)
 
                         # Add to database
-                        if parameters.pachaya and idx == 1:
-                            break
-                        else:
-                            update_data(
-                                random_parameters, extra_vars['figure_name'],
-                                hp_set['_id'], it_score)
+                        update_data(
+                            random_parameters, extra_vars['figure_name'],
+                            hp_set['_id'], it_score)
                         printProgress(
                             idx, num_sets,
                             prefix=extra_vars['figure_name'] +
@@ -179,3 +187,4 @@ def optimize_model(im,gt,extra_vars,parameters):
                             '; Correlation: ' + str(np.around(it_score, 2)),
                             bar_length=30)
                     idx += 1
+                    break

@@ -150,7 +150,7 @@ def create_stimuli(gt,extra_vars,parameters):
     all_x = []
     for idx, col in enumerate(extra_vars['test_colors']):
         all_x.append(make_stimulus(col,extra_vars))
-    np.save(parameters.f7_stimuli_file,all_x)
+    return all_x
 
 def optimize_model(gt,extra_vars,parameters):
 
@@ -160,7 +160,8 @@ def optimize_model(gt,extra_vars,parameters):
         outer_parameters.lesions = lesion
         print('Running optimizations on problem ' + extra_vars['figure_name'] + ' after lesioning: ' + ' '.join(outer_parameters.lesions))
         build_graph = True
-        stimuli = np.load(outer_parameters.f7_stimuli_file)
+        # stimuli = np.load(outer_parameters.f7_stimuli_file)
+        stimuli = create_stimuli(gt,extra_vars,defaults)
 
         #Do hp optimization
         num_sets = count_sets(lesion,extra_vars['figure_name'])[0]['count']
@@ -204,4 +205,5 @@ def optimize_model(gt,extra_vars,parameters):
                             prefix = extra_vars['figure_name'] + ' progress on lesion ' + lesion + ':', 
                             suffix = 'Iteration time: ' + str(np.around(run_time,2)) + '; Correlation: ' + str(np.around(it_score,2)), 
                             bar_length = 30)
+                    break
                     idx+=1

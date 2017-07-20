@@ -4,7 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 import scipy as sp
 from ops import stimuli as stim
 from ops.parameter_defaults import PaperDefaults
-from ops.dumb_daemon_db_hp_optim import optimize_model
+from ops.dumb_daemon_db_hp_optim import optimize_model, sampler
 from ops import model_utils
 from ops.fig_tpbtcso_utils import _plot_TrottBorn2015_tcso_data as get_gt
 
@@ -25,6 +25,7 @@ def run():
 
 
     # experiment parameters
+    scale = sampler(scale)
     cvals = (sp.arange(-90, 90, 30) + 90.) / 180.
     svals = sp.linspace(0.0, 1.0, 6).tolist() + [sp.nan]
 

@@ -57,21 +57,8 @@ def run(initialize_model=False):
     extra_vars['aux_y'] = []
     extra_vars['percent_reg_train'] = 80.
 
-    if initialize_model:
-        create_stims(extra_vars)
-    stim_files = np.load(extra_vars['f4_stimuli_file'])
-    extra_vars['stims_all_lms'] = stim_files['stims_all_lms']
-
-    #Run model
-    #cx.run(so_all, from_gpu=False)
-    #sx_all[:] = cx.Y.get()[:, :, size//2, size//2]
     adj_gt = np.mean(kw2015_fig2_y,axis=0)
-    im = stim_files['so_ind'].reshape(
-        n_t_hues*n_s_hues,len(_DEFAULT_KW2015_SO_PARAMETERS['norm_channels']),size,size)
-    extra_vars['aux_data'] = stim_files['so_all'].transpose(0,2,3,1) 
-    extra_vars['cs_hue_diff'] = stim_files['cs_hue_diff']
-
-    optimize_model(im,adj_gt,extra_vars,defaults)
+    optimize_model([],adj_gt,extra_vars,defaults)
 
 if __name__ == '__main__':
     run()

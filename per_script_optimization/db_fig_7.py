@@ -103,12 +103,10 @@ def run(make_stims=False):
     extra_vars['n_col'] = len(test_colors)
     extra_vars['figure_name'] = 'f7'
     extra_vars['return_var'] = 'O'
+    extra_vars['defaults'] = defaults
 
     # measure shift for phase & antiphase inducers, for each test
-    if make_stims:
-        create_stimuli(gt,extra_vars,defaults)
-    else:
-        optimize_model(gt,extra_vars,defaults)
+    optimize_model(gt,extra_vars,defaults)
 
 if __name__ == '__main__':
     run()

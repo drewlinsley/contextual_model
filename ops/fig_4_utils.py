@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 from skimage import img_as_float
 from skimage.color import xyz2rgb, rgb2xyz
-from hmax.models.hnorm import models as mod
+import hmax_models as mod
 from hmax.tools.utils import pb
 from hmax.models.ucircuits.contextual import stimuli as stim
 from sklearn import linear_model
@@ -261,8 +261,12 @@ def create_stims(extra_vars):
     cs_hue_diff = da2ha(test_hues_dklS.reshape(extra_vars.n_t_hues, 1) - \
         surr_hues_dklS.reshape(1, extra_vars.n_s_hues))
     cs_hue_diff *= (180 / sp.pi)
-    np.savez(extra_vars.f4_stimuli_file,so_all=so_all,so_ind=so_ind,
-        stims_all_lms=stims_all_lms,cs_hue_diff=cs_hue_diff)
+    return {
+        'so_all': so_all,
+        'so_ind': so_ind,
+        'stims_all_lms': stims_all_lms,
+        'cs_hue_diff': cs_hue_diff
+    }
 
 Y_reference = 0.75
 gray_xyY = sp.array([0.310, 0.316, Y_reference])

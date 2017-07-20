@@ -4,7 +4,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='1'
 import scipy as sp
 from ops import stimuli as stim
 from ops.parameter_defaults import PaperDefaults
-from ops.dumb_daemon_db_hp_optim import optimize_model
+from ops.dumb_daemon_db_hp_optim import optimize_model, sampler
 from ops import model_utils
 
 def run(hps=None):
@@ -19,6 +19,7 @@ def run(hps=None):
     csvfiles=sp.array([[os.path.join(defaults._DATADIR, 'BWC2009_%i_%i.csv' \
     % (i, j)) for i in _DEFAULT_BWC_CSV_CTS] for j in _DEFAULT_BWC_CSV_CTS]).T
 
+    scale = sampler(scale)
     # experiment parameters
     im = sp.array([
         stim.get_center_surround(

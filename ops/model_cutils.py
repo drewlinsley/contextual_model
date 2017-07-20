@@ -16,7 +16,7 @@ from copy import deepcopy
 import numpy as np
 from numpy import r_, s_
 import scipy as sp
-from hmax.models.hnorm import models as mod
+from ops import hmax_models as mod
 from hmax.models.hnorm.barams import floatX
 import sklearn as sl
 from sklearn import utils

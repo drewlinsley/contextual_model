@@ -92,5 +92,4 @@ if defaults.remove_figures is not None:
         set(defaults.db_problem_columns) - set(defaults.remove_figures))
 
 plot_chart(max_row, defaults)  # also include bootstrapped CIs
-import ipdb;ipdb.set_trace()
 plot_distributions(lesions=lesion_dict['None'], defaults=defaults)

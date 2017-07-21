@@ -156,7 +156,7 @@ def execute_density_plot(it_data, name, defaults, col_wrap=None):
     plt.close('all')
 
 
-def execute_histogram_plot(it_data, name, defaults, ax=None):
+def execute_histogram_plot(it_data, name, defaults, ax=None, height=None):
     # Plot with seaborn
     sns.set(style="ticks")
     X = it_data['Model fit'].as_matrix().reshape(-1, 1).astype(np.float32)
@@ -173,7 +173,7 @@ def execute_histogram_plot(it_data, name, defaults, ax=None):
         # plt.bar(bins[:-1], hist, 0.01)
         plt.hist(X, bins=np.linspace(-1, 1, len(X)), weights=weights)
     ax.set_xlim([-1, 1])
-    ax.set_ylim([0, 150])
+    ax.set_ylim([0, height])
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     ax.set_xticks([])
@@ -201,9 +201,16 @@ def plot_distributions(lesions, defaults):
     unique_labels = np.unique(df['Figure name'])
     f, axs = plt.subplots(2, 4)
     axs = axs.reshape(-1)
+    # Find max value across the normed histograms
+    max_height = []
+    for idx, lab in enumerate(unique_labels):
+        it_data = df[df['Figure name'] == lab]
+        X = it_data['Model fit'].as_matrix().reshape(-1, 1).astype(np.float32)
+        hist, bins = np.histogram(X, len(X), range=(-1., 1.), density=True)
+        max_height += [hist]
     for idx, (lab, ax) in enumerate(zip(unique_labels, axs)):
         it_data = df[df['Figure name'] == lab]
-        execute_histogram_plot(it_data, idx, defaults, ax=ax)
+        execute_histogram_plot(it_data, idx, defaults, ax=ax, height=np.sum(max_height[0])/2)
         # execute_density_plot(it_data, idx, defaults)
 
 

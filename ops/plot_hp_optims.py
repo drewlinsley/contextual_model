@@ -159,13 +159,21 @@ def execute_density_plot(it_data, name, defaults, col_wrap=None):
 def execute_histogram_plot(it_data, name, defaults, ax=None):
     # Plot with seaborn
     sns.set(style="ticks")
-    X = it_data['Model fit'].as_matrix().reshape(-1, 1)
+    X = it_data['Model fit'].as_matrix().reshape(-1, 1).astype(np.float32)
+    weights = np.ones_like(X) / float(len(X))
+    hist, bins = np.histogram(X, len(X), range=(-1., 1.), density=True)
+    # bins = np.diff(bins)
+    if np.isnan(X).sum():
+        print 'Found nans in the data.'
+        X = X[np.isnan(X) == False]
     if ax is not None:
-        ax.hist(X, bins=np.linspace(-1, 1, 10e3), normed=True)
+        ax.bar(bins[:-1], hist, 0.01)
+        # ax.hist(X, bins=100, weights=weights)  # bins=np.linspace(-1, 1, len(X)), weights=weights)
     else:
-        plt.hist(X, bins=np.linspace(-1, 1, 1e3), normed=True)
-    plt.xlim([-1, 1])
-    plt.ylim([0, 1])
+        # plt.bar(bins[:-1], hist, 0.01)
+        plt.hist(X, bins=np.linspace(-1, 1, len(X)), weights=weights)
+    ax.set_xlim([-1, 1])
+    ax.set_ylim([0, 110])
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     ax.set_xticks([])

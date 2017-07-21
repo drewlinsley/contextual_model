@@ -168,12 +168,12 @@ def execute_histogram_plot(it_data, name, defaults, ax=None):
         X = X[np.isnan(X) == False] 
     if ax is not None:
         ax.bar(bins[:-1], hist, 0.01)
-        # ax.hist(X, bins=np.linspace(-1, 1, len(X)), weights=weights)
+        # ax.hist(X, bins=100, weights=weights)  # bins=np.linspace(-1, 1, len(X)), weights=weights)
     else:
-        plt.bar(bins[:-1], hist, 0.01)
-        # plt.hist(X, bins=np.linspace(-1, 1, len(X)), weights=weights)
-    plt.xlim([-1, 1])
-    plt.ylim([0, 1])
+        # plt.bar(bins[:-1], hist, 0.01)
+        plt.hist(X, bins=np.linspace(-1, 1, len(X)), weights=weights)
+    ax.set_xlim([-1, 1])
+    ax.set_ylim([0, 100])
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     ax.set_xticks([])

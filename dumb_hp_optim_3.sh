@@ -2,11 +2,10 @@
 
 START=1
 END=1000
-i=$START
-while [[ $i -le $END ]]
-do 
-    CUDA_VISIBLE_DEVICES=3 python per_script_optimization/db_fig_bw.py
-    CUDA_VISIBLE_DEVICES=3 python per_script_optimization/db_fig_tbp.py
-    CUDA_VISIBLE_DEVICES=3 python per_script_optimization/db_fig_tbtcso.py
-    i=$((i + 1))
+for (( i=$START; i <= $END; ++i ))
+do
+    CUDA_VISIBLE_DEVICES=0 python per_script_optimization/db_fig_bw.py
+    CUDA_VISIBLE_DEVICES=0 python per_script_optimization/db_fig_tbp.py
+    CUDA_VISIBLE_DEVICES=0 python per_script_optimization/db_fig_tbtcso.py
 done
+

@@ -20,6 +20,9 @@ def find_best_fit(lesion_data, defaults):
     mus = np.zeros((len(lesion_data)))
     for idx, row in enumerate(lesion_data):
         figure_fits = [row[k] for k in defaults.db_problem_columns]
+        if None in figure_fits:
+            print 'Warning, None detected in your figure fits'
+        figure_fits = [np.nan if i is None else i for i in figure_fits]
         # if None in figure_fits:
         #   raise TypeError
         # summarize with a z score
@@ -54,26 +57,29 @@ defaults.lesions = new_order
 print defaults.lesions
 
 # Run stats -- None versus the rest
-target_key = 'None'
-Tvs = max_row[target_key]
-T = [np.arctanh(Tvs[col]) for col in defaults.db_problem_columns]
-t_keys = [k for k in defaults.lesions if k is not target_key]
-t_stats = {}
-p_values = {}
+try:
+    target_key = 'None'
+    Tvs = max_row[target_key]
+    T = [np.arctanh(Tvs[col]) for col in defaults.db_problem_columns]
+    t_keys = [k for k in defaults.lesions if k is not target_key]
+    t_stats = {}
+    p_values = {}
 
-for k in t_keys:
-    t = [np.arctanh(max_row[k][col]) for col in defaults.db_problem_columns]
-    tv, pv = stats.ttest_rel(T, t)
-    t_stats[k] = tv
-    p_values[k] = pv
+    for k in t_keys:
+        t = [np.arctanh(max_row[k][col]) for col in defaults.db_problem_columns]
+        tv, pv = stats.ttest_rel(T, t)
+        t_stats[k] = tv
+        p_values[k] = pv
 
-np.savez(
-    os.path.join(
-        defaults._FIGURES, 'best_hps'),
-    lesions=defaults.lesions,
-    max_row=max_row,
-    p_values=p_values,
-    t_stats=t_stats)
+    np.savez(
+        os.path.join(
+            defaults._FIGURES, 'best_hps'),
+        lesions=defaults.lesions,
+        max_row=max_row,
+        p_values=p_values,
+        t_stats=t_stats)
+except:
+    print 'Stats failed'
 
 # Remove Empty "lesions"
 for v in max_row.values():
@@ -92,5 +98,4 @@ if defaults.remove_figures is not None:
         set(defaults.db_problem_columns) - set(defaults.remove_figures))
 
 plot_chart(max_row, defaults)  # also include bootstrapped CIs
-import ipdb;ipdb.set_trace()
 plot_distributions(lesions=lesion_dict['None'], defaults=defaults)

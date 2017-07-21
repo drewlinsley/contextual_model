@@ -125,6 +125,7 @@ def optimize_model(im,gt,extra_vars,parameters):
 
         # Do hp optimization
         num_sets = count_sets(lesion, extra_vars['figure_name'])[0]['count']
+        all_f3s = []
         if num_sets > 0:
             idx = 0  # keep a count
             # Initialize the session
@@ -154,7 +155,7 @@ def optimize_model(im,gt,extra_vars,parameters):
                         oy, run_time = compute_shifts(
                             x=x, sess=sess, ctx=ctx,
                             extra_vars=extra_vars,
-                            default_parameters=random_parameters) 
+                            default_parameters=random_parameters)
 
                         # Postprocess the model's outputs
                         y, aux_data = model_utils.data_postprocessing(
@@ -164,12 +165,9 @@ def optimize_model(im,gt,extra_vars,parameters):
                         it_score = get_fits(y, gt, extra_vars)
 
                         # Add to database
-                        if parameters.pachaya and idx == 1:
-                            break
-                        else:
-                            update_data(
-                                random_parameters, extra_vars['figure_name'],
-                                hp_set['_id'], it_score)
+                        update_data(
+                            random_parameters, extra_vars['figure_name'],
+                            hp_set['_id'], it_score)
                         printProgress(
                             idx, num_sets,
                             prefix=extra_vars['figure_name'] +
@@ -178,4 +176,7 @@ def optimize_model(im,gt,extra_vars,parameters):
                             str(np.around(run_time, 2)) +
                             '; Correlation: ' + str(np.around(it_score, 2)),
                             bar_length=30)
+                    all_f3s += [y]
                     idx += 1
+        np.savez('f3_plot_data', y=all_f3s, gt=gt)
+

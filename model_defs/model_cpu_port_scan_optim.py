@@ -153,17 +153,21 @@ class ContextualCircuit(object):
 
         # tuned summation: pooling in h, w dimensions
         #############################################
+        SSF_ = 2 * ifloor(SSF/2.0) + 1
+        t_array = sp.zeros((k, k, SSF_, SSF_))
         SSN_ = 2 * ifloor(SSN/2.0) + 1
-        p_array = sp.zeros((k, k, SSN_, SSN_))
+        p_array = sp.zeros((k, k, SSF_, SSF_))  # Both 29 pixel kernels
+
+        # SSN is near SSF is far
 
         # Uniform weights
         for pdx in range(k):
-            p_array[pdx, pdx, :SSN, :SSN] = 1.0
+            p_array[pdx, pdx, :SSF, :SSF] = 1.0
         p_array[
             :, :,  # exclude classical receptive field!
-            SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0),
-            SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0)] = 0.0
-        p_array /= SSN**2 - SRF**2  # normalize to get true average
+            SSF//2-ifloor(SRF/2.0):SSF//2+iceil(SRF/2.0),
+            SSF//2-ifloor(SRF/2.0):SSF//2+iceil(SRF/2.0)] = 0.0
+        p_array /= SSF**2 - SRF**2  # normalize to get true average
         p_array = p_array.transpose(2, 3, 0, 1)
 
         # Gaussian weights
@@ -173,16 +177,15 @@ class ContextualCircuit(object):
 
         # tuned suppression: pooling in h, w dimensions
         ###############################################
-        SSF_ = 2 * ifloor(SSF/2.0) + 1
-        t_array = sp.zeros((k, k, SSF_, SSF_))
 
         # Uniform weights
         for tdx in range(k):
             t_array[tdx, tdx, :SSF, :SSF] = 1.0
-        t_array[:, :,  # exclude near surround!
-            SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0),
-            SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0)] = 0.0
-        t_array /= SSF**2 - SSN**2  # normalize to get true average
+        t_array[
+            :, :,  # exclude classical receptive field!
+            SSF//2-ifloor(SRF/2.0):SSF//2+iceil(SRF/2.0),
+            SSF//2-ifloor(SRF/2.0):SSF//2+iceil(SRF/2.0)] = 0.0
+        t_array /= SSF**2 - SRF**2  # normalize to get true average
         t_array = t_array.transpose(2, 3, 0, 1)
 
         # Tf dimension reordering

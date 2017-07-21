@@ -173,7 +173,7 @@ def execute_histogram_plot(it_data, name, defaults, ax=None):
         # plt.bar(bins[:-1], hist, 0.01)
         plt.hist(X, bins=np.linspace(-1, 1, len(X)), weights=weights)
     ax.set_xlim([-1, 1])
-    ax.set_ylim([0, 110])
+    ax.set_ylim([0, 150])
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     ax.set_xticks([])

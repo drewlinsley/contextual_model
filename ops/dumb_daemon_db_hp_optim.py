@@ -125,7 +125,6 @@ def optimize_model(im,gt,extra_vars,parameters):
 
         # Do hp optimization
         num_sets = count_sets(lesion, extra_vars['figure_name'])[0]['count']
-        all_f3s = []
         if num_sets > 0:
             idx = 0  # keep a count
             # Initialize the session
@@ -176,7 +175,5 @@ def optimize_model(im,gt,extra_vars,parameters):
                             str(np.around(run_time, 2)) +
                             '; Correlation: ' + str(np.around(it_score, 2)),
                             bar_length=30)
-                    all_f3s += [y]
                     idx += 1
-        np.savez('f3_plot_data', y=all_f3s, gt=gt)
 

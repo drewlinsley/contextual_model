@@ -15,6 +15,18 @@ the CI of the cell IDed in #3
 """
 
 
+def perm_test(ta, tb, iterations=10000):
+    T = np.asarray(ta) - np.asarray(tb)
+    T_len = len(T)
+    Tm = T.mean()
+    diffs = np.zeros((iterations))
+    for idx in range(iterations):
+        signs = np.sign(np.random.rand(T_len) - 0.5)
+        diffs[idx] = np.mean(T * signs)
+    p_val = (np.sum(Tm < diffs) + 1).astype(float) / np.asarray(iterations + 1).astype(float)
+    return p_val
+
+
 def find_best_fit(lesion_data, defaults):
     zs = np.zeros((len(lesion_data)))
     mus = np.zeros((len(lesion_data)))
@@ -66,6 +78,8 @@ for k in t_keys:
     tv, pv = stats.ttest_rel(T, t)
     t_stats[k] = tv
     p_values[k] = pv
+    p_values[k] = perm_test(T, t)
+print [(k, v) for k, v in p_values.iteritems()]
 
 np.savez(
     os.path.join(

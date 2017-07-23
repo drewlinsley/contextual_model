@@ -189,7 +189,7 @@ class ContextualCircuit(object):
             SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0)] = 0.0
         p_array /= SSN**2 - SRF**2  # normalize to get true average
         if gaussian:
-            g = makeGaussian(SSN_, fwhm=sampler(SSN_))[None, None, :, :]
+            g = makeGaussian(SSN_, fwhm=sampler(SSN_))
             p_array *= g
         p_array = p_array.transpose(2, 3, 0, 1)
 
@@ -210,10 +210,10 @@ class ContextualCircuit(object):
             SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0),
             SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0)] = 0.0
         t_array /= SSF**2 - SSN**2  # normalize to get true average
-        t_array = t_array.transpose(2, 3, 0, 1)
         if gaussian:
-            g = makeGaussian(SSF_, fwhm=sampler(SSF_))[None, None, :, :]
+            g = makeGaussian(SSF_, fwhm=sampler(SSF_))
             t_array *= g
+        t_array = t_array.transpose(2, 3, 0, 1)
 
         # Tf dimension reordering
         self._gpu_t = tf.get_variable(

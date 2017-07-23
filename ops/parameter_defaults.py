@@ -32,7 +32,7 @@ class PaperDefaults(object):
             raise ValueError('Invalid value for _PARAMETER_SET_VERSION')
 
 
-        self.table_name = 'fixed_full_table'  # 'full_table'  # 'omega'  # 'mu_nu_2'  # alpha_beta_2 mu_nu'  # 'sig_tau' hpcombos'  # 'xi_lesion'  # 'hpcombos'
+        self.table_name = 'gaussian_ecrfs'  # 'fixed_full_table'  # 'full_table'  # 'omega'  # 'mu_nu_2'  # alpha_beta_2 mu_nu'  # 'sig_tau' hpcombos'  # 'xi_lesion'  # 'hpcombos'
         #Figure specific items
         self.f4_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f4.npz' 
         self.f7_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f7.npy'
@@ -60,8 +60,8 @@ class PaperDefaults(object):
         }
 
         self.hp_optim_type = 'none'  #'none' 'uniform' 'random' random_exp and 'random_linear'
-        # self.lesions = ['None']  # ,'Q','U','P','T']  #['mely']
-        self.lesions = ['None', 'Q', 'U', 'P', 'T', 'mu_nu_insert', 'alpha_beta_insert', 'combined_crf_ercf_insert', 'overlapping_ecrf_insert']  # , 'omega']
+        self.lesions = ['None']  # ,'Q','U','P','T']  #['mely']
+        # self.lesions = ['None', 'Q', 'U', 'P', 'T', 'mu_nu_insert', 'alpha_beta_insert', 'combined_crf_ercf_insert', 'overlapping_ecrf_insert']  # , 'omega']
         if 'omega' in self.lesions:
             self.optimize_omega = True
             self.tunable_params = ['alpha','beta','mu','nu','gamma','delta','omega']

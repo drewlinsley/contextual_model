@@ -20,6 +20,29 @@ CircuitParameters = namedtuple(
 _DEFAULT_PARAMETERS_TEMPLATE = deepcopy(defaults['_DEFAULT_PARAMETERS'])
 
 
+def sampler(x):
+        return abs(np.random.uniform(low=x - 1, high=x + 1) + x) ** np.random.uniform(low=-2.,high=2.)  # previously did [0, 2]
+
+
+def makeGaussian(size, fwhm = 3, center=None):
+    """ Make a square gaussian kernel.
+    size is the length of a side of the square
+    fwhm is full-width-half-maximum, which
+    can be thought of as an effective radius.
+    """
+
+    x = np.arange(0, size, 1, float)
+    y = x[:,np.newaxis]
+    
+    if center is None:
+        x0 = y0 = size // 2
+    else:
+        x0 = center[0]
+        y0 = center[1]
+    
+    return np.exp(-4*np.log(2) * ((x-x0)**2 + (y-y0)**2) / fwhm**2)
+
+
 def _sgw(k, s):
     """ Shifted histogram of Gaussian weights, centered appropriately """
     x = sp.linspace(0.0, 1.0, k)
@@ -53,6 +76,7 @@ class ContextualCircuit(object):
         self.keepvars = keepvars
         self.input_shape = input_shape
         self.lesions = lesions
+        self.gaussian = gaussian
 
         try:
             for pkey, pval in parameters.iteritems():
@@ -164,6 +188,9 @@ class ContextualCircuit(object):
             SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0),
             SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0)] = 0.0
         p_array /= SSN**2 - SRF**2  # normalize to get true average
+        if gaussian:
+            g = makeGaussian(SSN_, fwhm=sampler(SSN_))
+            p_array *= g
         p_array = p_array.transpose(2, 3, 0, 1)
 
         # Gaussian weights
@@ -183,10 +210,12 @@ class ContextualCircuit(object):
             SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0),
             SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0)] = 0.0
         t_array /= SSF**2 - SSN**2  # normalize to get true average
+        if gaussian:
+            g = makeGaussian(SSF_, fwhm=sampler(SSF_))
+            t_array *= g
         t_array = t_array.transpose(2, 3, 0, 1)
 
         # Tf dimension reordering
-        # Gaussian weights
         self._gpu_t = tf.get_variable(
             name='t_array', dtype=self.floatXtf, initializer=t_array.astype(
                 self.floatXnp))

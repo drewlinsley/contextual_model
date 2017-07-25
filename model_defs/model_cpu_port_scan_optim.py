@@ -431,7 +431,7 @@ class ContextualCircuit(object):
             # O_diff
         ]
 
-        if self.overlap_CRFS:
+        if not self.overlap_CRFS:
             body_fun = self.body
         else:
             body_fun = self.body_overlap_CRF_eCRF

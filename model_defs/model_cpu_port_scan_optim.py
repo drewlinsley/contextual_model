@@ -77,6 +77,7 @@ class ContextualCircuit(object):
         self.input_shape = input_shape
         self.lesions = lesions
         self.gaussian = gaussian
+        self.overlap_CRFS = overlap_CRFS
 
         try:
             for pkey, pval in parameters.iteritems():
@@ -430,9 +431,13 @@ class ContextualCircuit(object):
             # O_diff
         ]
 
+        if self.overlap_CRFS:
+            body_fun = self.body
+        else:
+            body_fun = self.body_overlap_CRF_eCRF
         returned = tf.while_loop(
             self.condition,
-            self.body_overlap_CRF_eCRF,  # self.body,
+            body_fun,
             loop_vars=elems,
             back_prop=False,
             swap_memory=False)

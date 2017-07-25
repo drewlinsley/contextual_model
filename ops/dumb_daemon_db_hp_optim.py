@@ -99,7 +99,6 @@ def get_fits(y,gt,extra_vars):
 def optimize_model(im,gt,extra_vars,parameters):
 
     #Do outer loop of lesions -- embed in variable scopes
-    data = []
     for lesion in parameters.lesions:
         outer_parameters = deepcopy(parameters)
         outer_parameters.lesions = lesion
@@ -161,7 +160,6 @@ def optimize_model(im,gt,extra_vars,parameters):
                         y, aux_data = model_utils.data_postprocessing(
                             x, oy, extra_vars)  # maybe return a dict instead?
 
-                        data += [y]
                         # Correlate simulation and ground truth
                         it_score = get_fits(y, gt, extra_vars)
 
@@ -184,4 +182,3 @@ def optimize_model(im,gt,extra_vars,parameters):
                         break
                     else:
                         idx += 1
-    np.save('f5_data', data)

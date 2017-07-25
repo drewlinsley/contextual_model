@@ -141,15 +141,15 @@ def plot_chart(max_rows, defaults):
 def execute_density_plot(it_data, name, defaults, col_wrap=None):
     # Plot with seaborn
     sns.set(style="ticks")
-    ax = sns.FacetGrid(it_data, col='Figure name', col_wrap=col_wrap)
+    with sns.axes_style("white"):
+        ax = sns.FacetGrid(it_data, col='Figure name', col_wrap=col_wrap, sharey=False)
     # bins = np.linspace(-1, 1, 20)
     ax = ax.map(
         sns.distplot, "Model fit", rug=False, hist=True,
-        norm_hist=False, kde=False, bins=np.linspace(0, 1, 100), color="black",  # bins=bins,
-        rug_kws={'alpha': 0.1, 'color': 'gray'})  # , edgecolor="r")
+        norm_hist=False, kde=False, bins=np.linspace(0, 1, 100), color="black")  # , edgecolor="r")
+    ax.set(xlim=[-1, 1])
     # plt.yticks([0, 150, 300, 450, 600, 750, 900])
-    plt.xlim([-1, 1])
-
+    # plt.xlim([-1, 1])
     plt.savefig(
         os.path.join(
             defaults._FIGURES, 'coefficient_distribution_%s.pdf' % name))
@@ -202,16 +202,20 @@ def plot_distributions(lesions, defaults):
     f, axs = plt.subplots(2, 4)
     axs = axs.reshape(-1)
     # Find max value across the normed histograms
-    max_height = []
-    for idx, lab in enumerate(unique_labels):
-        it_data = df[df['Figure name'] == lab]
-        X = it_data['Model fit'].as_matrix().reshape(-1, 1).astype(np.float32)
-        hist, bins = np.histogram(X, len(X), range=(-1., 1.), density=True)
-        max_height += [hist]
+    # max_height = []
+    # for idx, lab in enumerate(unique_labels):
+    #     it_data = df[df['Figure name'] == lab]
+    #     X = it_data['Model fit'].as_matrix().reshape(-1, 1).astype(np.float32)
+    #     hist, bins = np.histogram(X, len(X), range=(-1., 1.), density=True)
+    #     max_height += [hist]
     for idx, (lab, ax) in enumerate(zip(unique_labels, axs)):
         it_data = df[df['Figure name'] == lab]
-        execute_histogram_plot(it_data, idx, defaults, ax=ax, height=np.sum(max_height[0])/2)
+        # execute_histogram_plot(it_data, idx, defaults, ax=ax, height=np.sum(max_height[0])/2)
         # execute_density_plot(it_data, idx, defaults)
+        sns.distplot(
+            it_data['Model fit'], rug=False, hist=True, ax=ax,
+            norm_hist=False, kde=False, bins=np.linspace(0, 1, 100),
+            color="black")
 
 
 if __name__ == '__main__':

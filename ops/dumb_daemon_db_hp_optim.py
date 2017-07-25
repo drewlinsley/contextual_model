@@ -178,4 +178,7 @@ def optimize_model(im,gt,extra_vars,parameters):
                             str(np.around(run_time, 2)) +
                             '; Correlation: ' + str(np.around(it_score, 2)),
                             bar_length=30)
-                    idx += 1
+                    if parameters.gaussian:
+                        break
+                    else:
+                        idx += 1

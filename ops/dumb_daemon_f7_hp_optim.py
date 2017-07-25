@@ -204,4 +204,7 @@ def optimize_model(gt,extra_vars,parameters):
                             prefix = extra_vars['figure_name'] + ' progress on lesion ' + lesion + ':', 
                             suffix = 'Iteration time: ' + str(np.around(run_time,2)) + '; Correlation: ' + str(np.around(it_score,2)), 
                             bar_length = 30)
-                    idx+=1
+                    if parameters.gaussian:
+                        break
+                    else:
+                        idx += 1

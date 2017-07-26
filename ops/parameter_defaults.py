@@ -69,7 +69,8 @@ class PaperDefaults(object):
             self.optimize_omega = False
             self.tunable_params = ['alpha','beta','mu','nu','gamma','delta']  # ,'omega']
         self.gaussian = True  # Use gaussian connectivity in eCRFs (random sigma)
-        self.overlap_CRFS = False
+        self.overlap_CRF_eCRF = False
+        self.overlap_eCRFs = False
         self.tune_max_scale = np.repeat(100, len(self.tunable_params)) #not used with random_log
         self.tune_step = np.repeat(0.01, len(self.tunable_params)) #not used with random_log
         self.iterations = 1000

@@ -77,7 +77,8 @@ class ContextualCircuit(object):
         self.input_shape = input_shape
         self.lesions = lesions
         self.gaussian = gaussian
-        self.overlap_CRFS = overlap_CRFS
+        self.overlap_CRF_eCRF = overlap_CRF_eCRF
+        self.overlap_eCRFs = overlap_eCRFs
 
         try:
             for pkey, pval in parameters.iteritems():
@@ -175,58 +176,101 @@ class ContextualCircuit(object):
 
         ###### Reviews Analysis 1: Try changing the eCRF tuning properties... 
         # Set these to gaussians instead of uniform and try a few different sigmas.
+        if self.overlap_eCRFs:
+            # tuned summation: pooling in h, w dimensions
+            #############################################
+            SSF_ = 2 * ifloor(SSF/2.0) + 1
+            t_array = sp.zeros((k, k, SSF_, SSF_))
+            SSN_ = 2 * ifloor(SSN/2.0) + 1
+            p_array = sp.zeros((k, k, SSF_, SSF_))  # Both 29 pixel kernels
 
-        # tuned summation: pooling in h, w dimensions
-        #############################################
-        SSN_ = 2 * ifloor(SSN/2.0) + 1
-        p_array = sp.zeros((k, k, SSN_, SSN_))
+            # SSN is near SSF is far
 
-        # Uniform weights
-        for pdx in range(k):
-            p_array[pdx, pdx, :SSN, :SSN] = 1.0
-        p_array[
-            :, :,  # exclude classical receptive field!
-            SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0),
-            SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0)] = 0.0
-        p_array /= SSN**2 - SRF**2  # normalize to get true average
-        if gaussian:
-            g = makeGaussian(SSN_, fwhm=sampler(SSN_))
-            p_array *= g
-        p_array = p_array.transpose(2, 3, 0, 1)
+            # Uniform weights
+            for pdx in range(k):
+                p_array[pdx, pdx, :SSF, :SSF] = 1.0
+            p_array[
+                :, :,  # exclude classical receptive field!
+                SSF//2-ifloor(SRF/2.0):SSF//2+iceil(SRF/2.0),
+                SSF//2-ifloor(SRF/2.0):SSF//2+iceil(SRF/2.0)] = 0.0
+            p_array /= SSF**2 - SRF**2  # normalize to get true average
+            p_array = p_array.transpose(2, 3, 0, 1)
 
-        # Gaussian weights
-        self._gpu_p = tf.get_variable(
-            name='p_array', dtype=self.floatXtf, initializer=p_array.astype(
-                self.floatXnp))
+            # Gaussian weights
+            self._gpu_p = tf.get_variable(
+                name='p_array', dtype=self.floatXtf, initializer=p_array.astype(
+                    self.floatXnp))
 
-        # tuned suppression: pooling in h, w dimensions
-        ###############################################
-        SSF_ = 2 * ifloor(SSF/2.0) + 1
-        t_array = sp.zeros((k, k, SSF_, SSF_))
+            # tuned suppression: pooling in h, w dimensions
+            ###############################################
 
-        # Uniform weights
-        for tdx in range(k):
-            t_array[tdx, tdx, :SSF, :SSF] = 1.0
-        t_array[:, :,  # exclude near surround!
-            SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0),
-            SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0)] = 0.0
-        t_array /= SSF**2 - SSN**2  # normalize to get true average
-        if gaussian:
-            g = makeGaussian(SSF_, fwhm=sampler(SSF_))
-            t_array *= g
-        t_array = t_array.transpose(2, 3, 0, 1)
+            # Uniform weights
+            for tdx in range(k):
+                t_array[tdx, tdx, :SSF, :SSF] = 1.0
+            t_array[
+                :, :,  # exclude classical receptive field!
+                SSF//2-ifloor(SRF/2.0):SSF//2+iceil(SRF/2.0),
+                SSF//2-ifloor(SRF/2.0):SSF//2+iceil(SRF/2.0)] = 0.0
+            t_array /= SSF**2 - SRF**2  # normalize to get true average
+            t_array = t_array.transpose(2, 3, 0, 1)
 
-        # Tf dimension reordering
-        self._gpu_t = tf.get_variable(
-            name='t_array', dtype=self.floatXtf, initializer=t_array.astype(
-                self.floatXnp))
+            # Tf dimension reordering
+            # Gaussian weights
+            self._gpu_t = tf.get_variable(
+                name='t_array', dtype=self.floatXtf, initializer=t_array.astype(
+                    self.floatXnp))
+        else:
+            # tuned summation: pooling in h, w dimensions
+            #############################################
+            SSN_ = 2 * ifloor(SSN/2.0) + 1
+            p_array = sp.zeros((k, k, SSN_, SSN_))
+
+            # Uniform weights
+            for pdx in range(k):
+                p_array[pdx, pdx, :SSN, :SSN] = 1.0
+            p_array[
+                :, :,  # exclude classical receptive field!
+                SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0),
+                SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0)] = 0.0
+            p_array /= SSN**2 - SRF**2  # normalize to get true average
+            if gaussian:
+                g = makeGaussian(SSN_, fwhm=sampler(SSN_))
+                p_array *= g
+            p_array = p_array.transpose(2, 3, 0, 1)
+
+            # Gaussian weights
+            self._gpu_p = tf.get_variable(
+                name='p_array', dtype=self.floatXtf, initializer=p_array.astype(
+                    self.floatXnp))
+
+            # tuned suppression: pooling in h, w dimensions
+            ###############################################
+            SSF_ = 2 * ifloor(SSF/2.0) + 1
+            t_array = sp.zeros((k, k, SSF_, SSF_))
+
+            # Uniform weights
+            for tdx in range(k):
+                t_array[tdx, tdx, :SSF, :SSF] = 1.0
+            t_array[:, :,  # exclude near surround!
+                SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0),
+                SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0)] = 0.0
+            t_array /= SSF**2 - SSN**2  # normalize to get true average
+            if gaussian:
+                g = makeGaussian(SSF_, fwhm=sampler(SSF_))
+                t_array *= g
+            t_array = t_array.transpose(2, 3, 0, 1)
+
+            # Tf dimension reordering
+            self._gpu_t = tf.get_variable(
+                name='t_array', dtype=self.floatXtf, initializer=t_array.astype(
+                    self.floatXnp))
 
     def body(
             self, i0, O, I, alpha, beta, mu, nu, gamma, delta):  # , I_diff, O_diff):
 
         # Track initial I, O
-        prev_I = tf.identity(I)
-        prev_O = tf.identity(O)
+        # prev_I = tf.identity(I)
+        # prev_O = tf.identity(O)
 
         if 'U' in self.lesions:
             U = tf.constant(0.)
@@ -431,10 +475,11 @@ class ContextualCircuit(object):
             # O_diff
         ]
 
-        if not self.overlap_CRFS:
-            body_fun = self.body
-        else:
+        if self.overlap_CRF_eCRF:
             body_fun = self.body_overlap_CRF_eCRF
+        else:
+            body_fun = self.body
+
         returned = tf.while_loop(
             self.condition,
             body_fun,

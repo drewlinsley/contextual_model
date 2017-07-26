@@ -403,7 +403,7 @@ class ContextualCircuit(object):
 
         returned = tf.while_loop(
             self.condition,
-            self.body_overlap_CRF_eCRF,  # self.body,
+            self.body,  # self.body,
             loop_vars=elems,
             back_prop=False,
             swap_memory=False)

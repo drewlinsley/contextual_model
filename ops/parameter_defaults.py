@@ -32,7 +32,7 @@ class PaperDefaults(object):
             raise ValueError('Invalid value for _PARAMETER_SET_VERSION')
 
 
-        self.table_name = 'f3_plot'  # 'fixed_full_table'  # 'gaussian_ecrfs'  # 'fixed_full_table'   # 'omega'  # 'mu_nu_2'  # alpha_beta_2 mu_nu'  # 'sig_tau' hpcombos'  # 'xi_lesion'  # 'hpcombos'
+        self.table_name = 'no_crf_overlap_gaussian_ecrfs'  # 'fixed_full_table'  # 'gaussian_ecrfs'  # 'fixed_full_table'   # 'omega'  # 'mu_nu_2'  # alpha_beta_2 mu_nu'  # 'sig_tau' hpcombos'  # 'xi_lesion'  # 'hpcombos'
         #Figure specific items
         self.f4_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f4.npz' 
         self.f7_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f7.npy'
@@ -68,10 +68,10 @@ class PaperDefaults(object):
         else:
             self.optimize_omega = False
             self.tunable_params = ['alpha','beta','mu','nu','gamma','delta']  # ,'omega']
-        self.gaussian = False  # Use gaussian connectivity in eCRFs (random sigma)
+        self.gaussian = True  # Use gaussian connectivity in eCRFs (random sigma)
         self.overlap_CRFS = False
-        self.tune_max_scale = np.repeat(100,len(self.tunable_params)) #not used with random_log
-        self.tune_step = np.repeat(0.01,len(self.tunable_params)) #not used with random_log
+        self.tune_max_scale = np.repeat(100, len(self.tunable_params)) #not used with random_log
+        self.tune_step = np.repeat(0.01, len(self.tunable_params)) #not used with random_log
         self.iterations = 1000
         self.db_schema = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/db_schema.txt'
         self.db_problem_columns = ['f3a','f3b','f4','f5','f7','bw','tbtcso','tbp'] #['f6']#

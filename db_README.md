@@ -15,3 +15,6 @@
 #Pachaya instructions:
 	a. You need to clone https://github.com/serre-lab/hmax/ and use the branch vbw.
 	b. A lot of the scripts unfortunately at the moment add that path with sys and a hardcoded path name. You can either make this more general and recode things or just change the path to reflect where your hmax directory is.
+
+# Use dumb_hp_optim_# scripts to optimize hyperparameters.
+# Use restart_hp_optim_# scripts to randomize stimulus tuning or eCRF connectivity (i.e. gaussian connections)

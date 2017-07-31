@@ -8,4 +8,3 @@ do
     CUDA_VISIBLE_DEVICES=0 python per_script_optimization/db_fig_tbp.py
     CUDA_VISIBLE_DEVICES=0 python per_script_optimization/db_fig_tbtcso.py
 done
-

@@ -18,3 +18,4 @@
 
 # Use dumb_hp_optim_# scripts to optimize hyperparameters.
 # Use restart_hp_optim_# scripts to randomize stimulus tuning or eCRF connectivity (i.e. gaussian connections)
+# The manuscript table is final_full_hpcombos

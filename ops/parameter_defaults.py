@@ -32,7 +32,7 @@ class PaperDefaults(object):
             raise ValueError('Invalid value for _PARAMETER_SET_VERSION')
 
 
-        self.table_name = 'no_crf_overlap_gaussian_ecrfs'  # 'fixed_full_table'  # 'gaussian_ecrfs'  # 'fixed_full_table'   # 'omega'  # 'mu_nu_2'  # alpha_beta_2 mu_nu'  # 'sig_tau' hpcombos'  # 'xi_lesion'  # 'hpcombos'
+        self.table_name = 'final_gaussian'  # 'final_full_hpcombos'
         #Figure specific items
         self.f4_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f4.npz' 
         self.f7_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f7.npy'
@@ -59,9 +59,11 @@ class PaperDefaults(object):
             'strides': [1, 1, 1, 1]
         }
 
-        self.hp_optim_type = 'none'  #'none' 'uniform' 'random' random_exp and 'random_linear'
+        self.hp_optim_type = 'random_exp'  #'none' 'uniform' 'random' random_exp and 'random_linear'
+        # self.lesions = ['None','Q','U','P','T']  #['mely']
         self.lesions = ['None']  # ,'Q','U','P','T']  #['mely']
-        # self.lesions = ['None', 'Q', 'U', 'P', 'T', 'mu_nu_insert', 'alpha_beta_insert', 'combined_crf_ercf_insert', 'overlapping_ecrf_insert']  # , 'omega']
+        # self.lesions = ['None', 'Q', 'U']  # , 'omega']
+        # self.lesions = ['None', 'P', 'T', 'mu_nu_insert', 'alpha_beta_insert', 'combined_crf_ercf_insert', 'overlapping_ecrf_insert']  # , 'omega']
         if 'omega' in self.lesions:
             self.optimize_omega = True
             self.tunable_params = ['alpha','beta','mu','nu','gamma','delta','omega']
@@ -74,7 +76,7 @@ class PaperDefaults(object):
         self.tune_max_scale = np.repeat(100, len(self.tunable_params)) #not used with random_log
         self.tune_step = np.repeat(0.01, len(self.tunable_params)) #not used with random_log
         self.iterations = 1000
-        self.db_schema = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/db_schema.txt'
+        self.db_schema = 'ops/db_schema.txt'
         self.db_problem_columns = ['f3a','f3b','f4','f5','f7','bw','tbtcso','tbp'] #['f6']#
         self.remove_figures = None  # leave to None if all
         # self.remove_figures = ['f3a','f3b','f4','f5','f7'] #['f6']#

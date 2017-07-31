@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS hpcombos
+DROP TABLE IF EXISTS final_full_hpcombos
 DROP TABLE IF EXISTS status
-create table hpcombos (_id bigserial primary key, lesions varchar, alpha float, beta float, mu float, nu float, gamma float, delta float, f3a float, f3b float, f4 float, f5 float, f7 float, tbp float, tbtcso float, bw float, working boolean default False)
+create table final_full_hpcombos (_id bigserial primary key, lesions varchar, alpha float, beta float, mu float, nu float, gamma float, delta float, f3a float, f3b float, f4 float, f5 float, f7 float, tbp float, tbtcso float, bw float, working boolean default False)
 create table status (_id bigserial primary key, fig_names varchar, working boolean default False); 

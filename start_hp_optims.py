@@ -9,7 +9,7 @@ print 'Generating hyperparameter combos'
 generate_combos()
 print 'Preparing settings table'
 prepare_settings(defaults.db_problem_columns)
-print 'Running damons on gpus %s' % (defaults.gpu_processes)
+print 'Running daemons on gpus %s' % (defaults.gpu_processes)
 #create_and_execute_daemons(defaults.gpu_processes) #ids of gpus. enter a new one for each daemon you want to run.
 #create_and_execute_daemons([0]) #ids of gpus. enter a new one for each daemon you want to run.
 #create_and_execute_daemons([2]) #ids of gpus. enter a new one for each daemon you want to run.

@@ -32,7 +32,7 @@ class PaperDefaults(object):
             raise ValueError('Invalid value for _PARAMETER_SET_VERSION')
 
 
-        self.table_name = 'final_gaussian'  # 'final_full_hpcombos'
+        self.table_name = 'final_full_hpcombos'
         #Figure specific items
         self.f4_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f4.npz' 
         self.f7_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f7.npy'
@@ -70,7 +70,7 @@ class PaperDefaults(object):
         else:
             self.optimize_omega = False
             self.tunable_params = ['alpha','beta','mu','nu','gamma','delta']  # ,'omega']
-        self.gaussian = True  # Use gaussian connectivity in eCRFs (random sigma)
+        self.gaussian = False  # Use gaussian connectivity in eCRFs (random sigma)
         self.overlap_CRF_eCRF = False
         self.overlap_eCRFs = False
         self.tune_max_scale = np.repeat(100, len(self.tunable_params)) #not used with random_log

@@ -32,7 +32,7 @@ class PaperDefaults(object):
             raise ValueError('Invalid value for _PARAMETER_SET_VERSION')
 
 
-        self.table_name = 'no_crf_overlap_tuning'  # 'full_table' 'omega'  # 'mu_nu_2'  # alpha_beta_2 mu_nu'  # 'sig_tau' hpcombos'  # 'xi_lesion'  # 'hpcombos'
+        self.table_name = 'final_tuning'  # 'full_table' 'omega'  # 'mu_nu_2'  # alpha_beta_2 mu_nu'  # 'sig_tau' hpcombos'  # 'xi_lesion'  # 'hpcombos'
         #Figure specific items
         self.f4_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f4.npz' 
         self.f7_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f7.npy'

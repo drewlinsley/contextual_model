@@ -32,7 +32,7 @@ class PaperDefaults(object):
             raise ValueError('Invalid value for _PARAMETER_SET_VERSION')
 
 
-        self.table_name = 'final_full_hpcombos'
+        self.table_name = 'MANUSCRIPT_FINAL'  # 'final_full_hpcombos'
         #Figure specific items
         self.f4_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f4.npz' 
         self.f7_stimuli_file = '/home/drew/Documents/tf_experiments/experiments/contextual_circuit/ops/special_figure_data/f7.npy'
@@ -60,10 +60,10 @@ class PaperDefaults(object):
         }
 
         self.hp_optim_type = 'random_exp'  #'none' 'uniform' 'random' random_exp and 'random_linear'
-        # self.lesions = ['None','Q','U','P','T']  #['mely']
-        self.lesions = ['None']  # ,'Q','U','P','T']  #['mely']
+        # self.lesions = ['None']  #['mely']
+        self.lesions = ['tuning']  # ,'Q','U','P','T']  #['mely']
         # self.lesions = ['None', 'Q', 'U']  # , 'omega']
-        # self.lesions = ['None', 'P', 'T', 'mu_nu_insert', 'alpha_beta_insert', 'combined_crf_ercf_insert', 'overlapping_ecrf_insert']  # , 'omega']
+        # self.lesions = ['None', 'P', 'T', 'mu_nu', 'alpha_beta', 'crf_ecrf_combo', 'overlapping_ecrf_insert']  # , 'omega']
         if 'omega' in self.lesions:
             self.optimize_omega = True
             self.tunable_params = ['alpha','beta','mu','nu','gamma','delta','omega']

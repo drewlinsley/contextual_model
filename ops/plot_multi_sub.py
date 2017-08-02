@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 # from ops import cell_figure_settings
 
 
-data = np.load('f3_plot_data.npz')
+data = np.load('f3_plot_data.npy')
 
 ttime = np.repeat(np.arange(data.shape[1])[None, :], data.shape[0], axis=0)
 ttime = ttime.reshape(-1, 1)

@@ -58,28 +58,31 @@ for lesion in defaults.lesions:
     # bootstrap here
 max_zs = {k: v.max() for k, v in score_dict.iteritems()}
 # Reorder the dimensions
-new_order = sorted(max_zs.items(), key=operator.itemgetter(1))[::-1]
-new_order = [tup[0] for tup in new_order]
-new_order.pop(new_order.index('None'))
-new_order = ['None'] + new_order
-defaults.lesions = new_order
-print defaults.lesions
-
-# Run stats -- None versus the rest
-target_key = 'None'
-Tvs = max_row[target_key]
-T = [np.arctanh(Tvs[col]) for col in defaults.db_problem_columns]
-t_keys = [k for k in defaults.lesions if k is not target_key]
 t_stats = {}
 p_values = {}
+if len(max_zs.keys()) > 1:
+    new_order = sorted(max_zs.items(), key=operator.itemgetter(1))[::-1]
+    new_order = [tup[0] for tup in new_order]
+    new_order.pop(new_order.index('None'))
+    new_order = ['None'] + new_order
+    defaults.lesions = new_order
+    print defaults.lesions
+    target_key = 'None'
 
-for k in t_keys:
-    t = [np.arctanh(max_row[k][col]) for col in defaults.db_problem_columns]
-    tv, pv = stats.ttest_rel(T, t)
-    t_stats[k] = tv
-    p_values[k] = pv
-    p_values[k] = perm_test(T, t)
-print [(k, v) for k, v in p_values.iteritems()]
+    # Run stats -- None versus the rest
+    Tvs = max_row[target_key]
+    T = [np.arctanh(Tvs[col]) for col in defaults.db_problem_columns]
+    t_keys = [k for k in defaults.lesions if k is not target_key]
+    for k in t_keys:
+        t = [np.arctanh(
+            max_row[k][col]) for col in defaults.db_problem_columns]
+        tv, pv = stats.ttest_rel(T, t)
+        t_stats[k] = tv
+        p_values[k] = pv
+        p_values[k] = perm_test(T, t)
+    print [(k, v) for k, v in p_values.iteritems()]
+else:
+    target_key = max_zs.keys()[0]
 
 np.savez(
     os.path.join(
@@ -106,4 +109,4 @@ if defaults.remove_figures is not None:
         set(defaults.db_problem_columns) - set(defaults.remove_figures))
 
 plot_chart(max_row, defaults)  # also include bootstrapped CIs
-plot_distributions(lesions=lesion_dict['None'], defaults=defaults)
+plot_distributions(lesions=lesion_dict[target_key], defaults=defaults)

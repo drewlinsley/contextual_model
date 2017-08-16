@@ -57,12 +57,15 @@ def compute_shifts(x, sess, ctx, extra_vars, default_parameters):
     }
     # ctx.xi:default_parameters._DEFAULT_PARAMETERS['xi'].reshape(-1,1),
     if extra_vars['return_var'] == 'I':
+        # y, y_diff = sess.run([ctx.out_I, ctx.I_diff], feed_dict=feed_dict)
         y, y_diff = sess.run([ctx.out_I, ctx.I_diff], feed_dict=feed_dict)
     elif extra_vars['return_var'] == 'O':
-        y, y_diff = sess.run([ctx.out_O, ctx.O_diff], feed_dict=feed_dict)
+        # y, y_diff = sess.run([ctx.out_O, ctx.O_diff], feed_dict=feed_dict)
+        y = sess.run(ctx.out_O, feed_dict=feed_dict)
     end = timer()
     run_time = end - start
-    return y, y_diff, run_time
+    return y, run_time
+    # return y, y_diff, run_time
 
 
 def prepare_hps(parameters, hp_set):
@@ -107,7 +110,7 @@ def get_fits(y, gt, extra_vars):
     return it_score
 
 
-def optimize_model(im, gt, extra_vars, parameters, lesion='None'):
+def optimize_model(im, gt, extra_vars, parameters, lesion='U'):
 
     if 'hp_file' in extra_vars.keys():
         hps = np.load(extra_vars['hp_file'])['max_row'].item()
@@ -115,6 +118,7 @@ def optimize_model(im, gt, extra_vars, parameters, lesion='None'):
         it_parameters = prepare_hps(parameters, hps)
     else:
         it_parameters = deepcopy(parameters)
+    it_parameters = deepcopy(parameters)
     # it_parameters = prepare_hps(outer_parameters, hps[lesion])
     it_parameters.lesions = lesion
     print(
@@ -153,14 +157,14 @@ def optimize_model(im, gt, extra_vars, parameters, lesion='None'):
     with tf.Session(
             config=tf.ConfigProto(allow_soft_placement=True)) as sess:
         if extra_vars['figure_name'] == 'f4':
-            extra_vars['aux_y'], aux_y_diff, run_time = compute_shifts(
+            extra_vars['aux_y'], _, run_time = compute_shifts(
                 x=extra_vars['aux_data'], sess=sess, ctx=aux_ctx,
                 extra_vars=extra_vars, default_parameters=it_parameters)
-        oy, y_diff, run_time = compute_shifts(
+        oy, run_time = compute_shifts(
             x=x, sess=sess, ctx=ctx, extra_vars=extra_vars,
             default_parameters=it_parameters)
 
-    plot_y_history(y_diff)
+    # plot_y_history(y_diff)
     y, aux_data = model_utils.data_postprocessing(x, oy, extra_vars)
     produce_plots(y, it_parameters.lesions, extra_vars, parameters)
     if gt is not None:

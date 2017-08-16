@@ -79,8 +79,9 @@ if len(max_zs.keys()) > 1:
         tv, pv = stats.ttest_rel(T, t)
         t_stats[k] = tv
         p_values[k] = pv
-        p_values[k] = perm_test(T, t)
+        # p_values[k] = perm_test(T, t)
     print [(k, v) for k, v in p_values.iteritems()]
+    print [(k, v) for k, v in t_stats.iteritems()]
 else:
     target_key = max_zs.keys()[0]
 
@@ -91,7 +92,6 @@ np.savez(
     max_row=max_row,
     p_values=p_values,
     t_stats=t_stats)
-
 # Remove Empty "lesions"
 for v in max_row.values():
     if v is None:

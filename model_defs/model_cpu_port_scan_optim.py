@@ -76,7 +76,8 @@ class ContextualCircuit(object):
         self.keepvars = keepvars
         self.input_shape = input_shape
         self.lesions = lesions
-        self.gaussian = gaussian
+        self.gaussian_spatial = gaussian_spatial
+        self.gaussian_channel = gaussian_channel
         self.overlap_CRF_eCRF = overlap_CRF_eCRF
         self.overlap_eCRFs = overlap_eCRFs
 
@@ -233,12 +234,25 @@ class ContextualCircuit(object):
                 SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0),
                 SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0)] = 0.0
             p_array /= SSN**2 - SRF**2  # normalize to get true average
-            if gaussian:
+            if self.gaussian_spatial:
                 g = makeGaussian(SSN_, fwhm=sampler(SSN_))
                 p_array *= g
-            p_array = p_array.transpose(2, 3, 0, 1)
+            if self.gaussian_channel:
+                for pdx in range(k):
+                    p_array[:, :, :SSN, :SSN] = 1.0
+                p_array[
+                    :, :,  # exclude classical receptive field!
+                    SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0),
+                    SSN//2-ifloor(SRF/2.0):SSN//2+iceil(SRF/2.0)] = 0.0
+                p_array /= SSN**2 - SRF**2  # normalize to get true average
+                weights = _sgw(k=k, s=sampler(OMEGA)) \
+                    if ISCONTINUOUS else _sdw(k=k, s=OMEGA)
+                weight_array = sp.array(
+                    [sp.roll(weights, shift=shift) for shift in range(k)])
+                p_array = p_array * weight_array[:, :, None, None]
 
-            # Gaussian weights
+            # Tf dimension reordering
+            p_array = p_array.transpose(2, 3, 0, 1)
             self._gpu_p = tf.get_variable(
                 name='p_array', dtype=self.floatXtf, initializer=p_array.astype(
                     self.floatXnp))
@@ -255,12 +269,24 @@ class ContextualCircuit(object):
                 SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0),
                 SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0)] = 0.0
             t_array /= SSF**2 - SSN**2  # normalize to get true average
-            if gaussian:
+            if self.gaussian_spatial:
                 g = makeGaussian(SSF_, fwhm=sampler(SSF_))
                 t_array *= g
-            t_array = t_array.transpose(2, 3, 0, 1)
+            if self.gaussian_channel:
+                for tdx in range(k):
+                    t_array[:, :, :SSF, :SSF] = 1.0
+                t_array[:, :,  # exclude near surround!
+                    SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0),
+                    SSF//2-ifloor(SSN/2.0):SSF//2+iceil(SSN/2.0)] = 0.0
+                t_array /= SSF**2 - SSN**2  # normalize to get true average
+                weights = _sgw(k=k, s=sampler(OMEGA)) \
+                    if ISCONTINUOUS else _sdw(k=k, s=OMEGA)
+                weight_array = sp.array(
+                    [sp.roll(weights, shift=shift) for shift in range(k)])
+                t_array = t_array * weight_array[:, :, None, None]
 
             # Tf dimension reordering
+            t_array = t_array.transpose(2, 3, 0, 1)
             self._gpu_t = tf.get_variable(
                 name='t_array', dtype=self.floatXtf, initializer=t_array.astype(
                     self.floatXnp))

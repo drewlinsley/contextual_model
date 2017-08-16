@@ -12,7 +12,7 @@ def plot_y_history(y_hist):
     plt.close(f)
 
 
-def produce_plots(y, lesion, extra_vars, parameters):
+def produce_plots(y, lesion, extra_vars, parameters, max_channels=True):
     if extra_vars['figure_name'] == 'size_tuning':
         fig, ax = plt.subplots()
         y = y.reshape(
@@ -22,20 +22,25 @@ def produce_plots(y, lesion, extra_vars, parameters):
 
         # size tuning curve
         for idx, cst in enumerate(extra_vars['contrasts']):
+            if max_channels:
+                it_y = y[
+                    idx, :, extra_vars['npoints']//2, :, :]
+                it_y = np.max(np.max(it_y, axis=-1), axis=-1)
+            else:
+                it_y = y[
+                    idx, :, extra_vars['npoints']//2, extra_vars['size']//2,
+                    extra_vars['size']//2]
             ax.plot(
                 extra_vars['stimsizes'],
-                y[
-                    idx, :, extra_vars['npoints']//2, extra_vars['size']//2,
-                    extra_vars['size']//2],
+                it_y,
                 color=extra_vars['curvecols'][idx], linewidth=5., alpha=.50)
             ax.plot(
                 extra_vars['stimsizes'],
-                y[
-                    idx, :, extra_vars['npoints']//2, extra_vars['size']//2,
-                    extra_vars['size']//2],
+                it_y,
                 color=extra_vars['curvecols'][idx],
                 label=extra_vars['curvelabs'][idx],
                 marker='o', linestyle='none', alpha=.75)
+
         # misc
         ax.plot(
             [1, 1], ax.get_ylim(), linewidth=3., linestyle='--', alpha=.75,

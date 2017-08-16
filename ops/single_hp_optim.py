@@ -213,7 +213,7 @@ def optimize_model(im, gt, extra_vars, parameters):
                 default_parameters=it_parameters)
 
         y, aux_data = model_utils.data_postprocessing(x, oy, extra_vars)
-        if extra_vars.has_key('save_file'):
+        if 'save_file' in extra_vars.keys():
             np.save(extra_vars['save_file'], y)
 
         if gt is not None:

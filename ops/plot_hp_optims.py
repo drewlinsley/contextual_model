@@ -138,15 +138,17 @@ def plot_chart(max_rows, defaults):
     return
 
 
-def execute_density_plot(it_data, name, defaults, col_wrap=None):
+def execute_density_plot(it_data, name, defaults, col_wrap=None, mask_zero=True):
     # Plot with seaborn
     sns.set(style="ticks")
+    if mask_zero:
+        it_data = it_data[it_data['Model fit'] != 0]
     with sns.axes_style("white"):
-        ax = sns.FacetGrid(it_data, col='Figure name', col_wrap=col_wrap, sharey=False)
+        ax = sns.FacetGrid(it_data, col='Figure name', col_wrap=col_wrap, sharey=False, sharex=True)
     # bins = np.linspace(-1, 1, 20)
     ax = ax.map(
         sns.distplot, "Model fit", rug=False, hist=True,
-        norm_hist=False, kde=False, bins=np.linspace(0, 1, 100), color="black")  # , edgecolor="r")
+        norm_hist=False, kde=False, bins=np.linspace(-1, 1, 200), color="black")  # , edgecolor="r")
     ax.set(xlim=[-1, 1])
     # plt.yticks([0, 150, 300, 450, 600, 750, 900])
     # plt.xlim([-1, 1])
@@ -214,8 +216,12 @@ def plot_distributions(lesions, defaults):
         # execute_density_plot(it_data, idx, defaults)
         sns.distplot(
             it_data['Model fit'], rug=False, hist=True, ax=ax,
-            norm_hist=False, kde=False, bins=np.linspace(0, 1, 100),
+            norm_hist=False, kde=False, bins=np.linspace(-1, 1, 200),
             color="black")
+        plt.xlim([-1, 1])
+        plt.savefig(
+            os.path.join(
+                defaults._FIGURES, 'coefficient_distribution_%s.pdf' % lab))
 
 
 if __name__ == '__main__':

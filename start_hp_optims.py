@@ -4,7 +4,7 @@ from ops.parameter_defaults import PaperDefaults
 
 defaults = PaperDefaults()
 print 'Initializing database'
-init_db()
+# init_db()
 print 'Generating hyperparameter combos'
 generate_combos()
 print 'Preparing settings table'

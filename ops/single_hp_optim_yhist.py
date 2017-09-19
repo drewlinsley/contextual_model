@@ -1,4 +1,5 @@
 import sys
+import json
 import os
 import numpy as np
 import tensorflow as tf
@@ -110,7 +111,7 @@ def get_fits(y, gt, extra_vars):
     return it_score
 
 
-def optimize_model(im, gt, extra_vars, parameters, lesion='U'):
+def optimize_model(im, gt, extra_vars, parameters, lesion='alpha_beta'):
 
     if 'hp_file' in extra_vars.keys():
         hps = np.load(extra_vars['hp_file'])['max_row'].item()
@@ -118,6 +119,7 @@ def optimize_model(im, gt, extra_vars, parameters, lesion='U'):
         it_parameters = prepare_hps(parameters, hps)
     else:
         it_parameters = deepcopy(parameters)
+    print json.dumps(hps, indent=4)
     it_parameters = deepcopy(parameters)
     # it_parameters = prepare_hps(outer_parameters, hps[lesion])
     it_parameters.lesions = lesion
@@ -169,4 +171,5 @@ def optimize_model(im, gt, extra_vars, parameters, lesion='U'):
     produce_plots(y, it_parameters.lesions, extra_vars, parameters)
     if gt is not None:
         it_score = get_fits(y, gt, extra_vars)
+        print 'Correlation: %s' % it_score
         return it_score

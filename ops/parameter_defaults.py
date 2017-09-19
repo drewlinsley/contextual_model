@@ -62,7 +62,8 @@ class PaperDefaults(object):
         self.hp_optim_type = 'random_exp'  #'none' 'uniform' 'random' random_exp and 'random_linear'
         # self.lesions = ['None']  #['mely']
         # self.lesions = ['tuning']  # ,'Q','U','P','T']  #['mely']
-        self.lesions = ['None', 'Q', 'U']  # , 'omega']
+        # self.lesions = ['None', 'Q', 'U']  # , 'omega']
+        self.lesions = ['alpha_beta']  # , 'omega']
         # self.lesions = ['None', 'P', 'T', 'mu_nu', 'alpha_beta', 'crf_ecrf_combo', 'final_ecrf_overlap']  # , 'omega']
         if 'omega' in self.lesions:
             self.optimize_omega = True

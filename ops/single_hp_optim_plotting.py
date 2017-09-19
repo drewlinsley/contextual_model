@@ -120,6 +120,11 @@ def produce_plots(y, lesion, extra_vars, parameters, max_channels=True):
             it_ax.plot(it_y)
         plt.show()
         plt.close(fig)
+    elif extra_vars['figure_name'] == 'f3a':
+        fig = plt.figure()
+        plt.plot(y)
+        plt.show()
+        plt.close(fig)
     else:
         print(
             'Plotting functions not in place for your figure: %s'

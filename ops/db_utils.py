@@ -62,8 +62,8 @@ def add_to_database(parameters,ofun,table_name=defaults.table_name):
     for l in parameters.lesions:
         for idx in range(parameters.iterations):
             random_parameters = ofun(parameters)._DEFAULT_PARAMETERS
-            cur.execute("INSERT INTO %s (lesions,alpha,beta,mu,nu,gamma,delta) VALUES (%s,%s,%s,%s,%s,%s,%s)",
-                (table_name,l,random_parameters['alpha'],random_parameters['beta'],
+            cur.execute("INSERT INTO " + table_name + " (lesions,alpha,beta,mu,nu,gamma,delta) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                (l,random_parameters['alpha'],random_parameters['beta'],
                     random_parameters['mu'],random_parameters['nu'],
                     random_parameters['gamma'],random_parameters['delta']))
 

@@ -145,6 +145,7 @@ def optimize_model(im,gt,extra_vars,parameters):
                 while 1:  # while we have hp to run on this lesion
                     hp_set = get_lesion_rows_from_db(
                         lesion, extra_vars['figure_name'], get_one=True)
+                    parameters.pachaya = True
                     if hp_set is None and parameters.pachaya is not True:
                         break
                     else:

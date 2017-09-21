@@ -6,6 +6,7 @@ Models of the ventral stream and the dorsal stream, including divisive normaliza
 
 import sys
 import scipy as sp
+import numpy as np
 import copy
 sys.path.append('/home/drew/Documents/hmax/models/hnorm')
 from computation_legacy import flexfilter, hwrectify
@@ -124,7 +125,6 @@ def dorsal_velocity(p, image, crop=False, resize=False, precomputed=None, handle
     if inhibition == 'subtractive':
         posweights = dnp_velocity['npool']['ndfilter']
         negweights = dnp_velocity['dpool']['ndfilter']
-        import ipdb; ipdb.set_trace()
         pos = flexfilter(posweights, st[:, :, :no, ...],
             axes=(-3, -2, -1), ndp=ndp)
         neg = flexfilter(negweights, st[:, :, :no, ...],
@@ -351,7 +351,10 @@ def ventral_so(p, image, handle=None, verbose=False):
     """
 
     def sampler(x):
-        return abs(np.random.uniform(low=x - 1, high=x + 1) + x) ** np.random.uniform(low=-2.,high=2.)  # previously did [0, 2]
+        # return abs(np.random.uniform(low=x - 0, high=x + 0) + x) ** np.random.uniform(low=1.,high=1.)  # previously did [0, 2]
+        # return abs(np.random.uniform(low=x - 1, high=x + 1) + x) ** np.random.uniform(low=-2.,high=2.)  # previously did [0, 2]
+        # return np.sign(np.random.uniform() - 0.5) * abs(np.random.uniform(low=x - 1, high=x + 1) + x) ** -2  # previously did [0, 2]
+        return np.random.uniform(low=-.5, high=.5)
 
     # Pre-process the image
     # im = preprocess_image(p, image)
@@ -375,10 +378,9 @@ def ventral_so(p, image, handle=None, verbose=False):
 
     # Filter
     for s in range(ns):
-        so[s] = sampler(flexfilter(g[s], im, ndp=ndp))
-        # out = sampler(out)
+        out = flexfilter(g[s], im, ndp=ndp)
+        so[s] = hwrectify(out + sampler(0), '+', 1)
         # so[s] = sp.concatenate((hwrectify(out, '+', 1), hwrectify(out, '-', 1)), axis=0)
-    so[:] = hwrectify(so)
 
     # Normalization: Mely's canonical form
     so[:] = divnorm(dnp, so[:], so[:])

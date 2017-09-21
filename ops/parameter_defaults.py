@@ -60,7 +60,7 @@ class PaperDefaults(object):
         }
 
         self.hp_optim_type = 'random_exp'  #'none' 'uniform' 'random' random_exp and 'random_linear'
-        self.lesions = ['None']  # ,'Q','U','P','T']  #['mely']
+        self.lesions = ['tuning']  # ,'Q','U','P','T']  #['mely']
         # self.lesions = ['None', 'Q', 'U', 'P', 'T', 'mu_nu_insert', 'alpha_beta_insert', 'combined_crf_ercf_insert', 'overlapping_ecrf_insert']  # , 'omega']
         if 'omega' in self.lesions:
             self.optimize_omega = True

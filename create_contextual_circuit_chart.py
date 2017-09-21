@@ -47,15 +47,7 @@ for lesion in defaults.lesions:
         it_max = dict(it_max)
     max_row[lesion] = it_max
     # bootstrap here
-max_zs = {k: v.max() for k, v in score_dict.iteritems()}
 # Reorder the dimensions
-new_order = sorted(max_zs.items(), key=operator.itemgetter(1))[::-1]
-new_order = [tup[0] for tup in new_order]
-new_order.pop(new_order.index('None'))
-new_order = ['None'] + new_order
-defaults.lesions = new_order
-print defaults.lesions
-
 # Run stats -- None versus the rest
 try:
     target_key = 'None'
@@ -82,10 +74,10 @@ except:
     print 'Stats failed'
 
 # Remove Empty "lesions"
-for v in max_row.values():
-    if v is None:
-        raise RuntimeError('Found empty row in your lesion matrix.')
-# max_row = {k: v for k, v in max_row.iteritems() if v is not None}
+# for v in max_row.values():
+#     if v is None:
+#         raise RuntimeError('Found empty row in your lesion matrix.')
+max_row = {k: v for k, v in max_row.iteritems() if v is not None}
 # defaults.lesions = max_row.keys()
 
 # If desired purge specific figures
@@ -97,5 +89,5 @@ if defaults.remove_figures is not None:
     defaults.db_problem_columns = list(
         set(defaults.db_problem_columns) - set(defaults.remove_figures))
 
-plot_chart(max_row, defaults)  # also include bootstrapped CIs
+# plot_chart(max_row, defaults)  # also include bootstrapped CIs
 plot_distributions(lesions=lesion_dict['None'], defaults=defaults)
